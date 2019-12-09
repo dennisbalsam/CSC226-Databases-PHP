@@ -64,40 +64,34 @@
         }
       }
       $stmt->free_result();
-      //change paging for prev 5 posts
+      //create buttons for paging
       if ($thispage > 1)
       {
 
           $page = $thispage - 1;
-
-          $prevpage = "<a href=\"index.php?$page=$page\">Previous</a>";
-
-      } else
-
+          // <a class="btn btn-primary float-left mt-5 mb-5" href="#" role="button">Last 5 posts</a> -->
+          $prevpage = "<a class=\"btn btn-primary float-left mt-5 mb-5\" href=\"index.php?&page=$page\">Previous 5 Posts</a>";
+          echo $prevpage;
+          if($thispage < $totalpages)
+          {
+            $page = $thispage + 1;
+            $nextpage = "<a class=\"btn btn-primary float-right mt-5 mb-5\" href=\"index.php?&page=$page\">Next 5 Posts</a>";
+            echo $nextpage;
+            
+          }
+  
+          
+      } 
+      else
       {
-
-          $prevpage = "";
+          if($thispage < $totalpages)
+          {
+            $page = $thispage + 1;
+            $nextpage = "<a class=\"btn btn-primary float-right mt-5 mb-5\" href=\"index.php?&page=$page\">Next 5 Posts</a>";
+            echo $nextpage;
+          }
 
       }
-
-      
-$bar = "";
-
-if ($totalpages > 1)
-{ 
-    for($page = 1; $page <= $totalpages; $page++)
-    {
-        if ($page == $thispage)      
-       {
-           $bar .= " $page ";
-       } else
-       {
-          $bar .= " <a href=\"index.php?&page=$page\">$page</a> ";
-          
-       }
-    }
-    echo $bar;
-}
     
   } 
 
