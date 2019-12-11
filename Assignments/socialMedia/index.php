@@ -33,13 +33,11 @@
 
 
       //select p.body,p.title,p.postdate, u.nickname ,case when exists (select c.body from comments c where p.postID = c.postID) then (select c.body from comments c where p.postID = c.postID) end from post p, users u where p.userID = u.userID ORDER BY p.postdate LIMIT 5
-      $sql = "SELECT p.body,p.title,p.postdate, u.nickname ,case when exists (select c.body from comments c where
-       p.postID = c.postID) then (select c.body from comments c where p.postID = c.postID) 
-      end from post p, users u where p.userID = u.userID ORDER BY p.postdate LIMIT  $offset, $recordsperpage";
+      $sql = "SELECT p.body,p.title,p.postdate, u.nickname, p.postID from post p, users u where p.userID = u.userID ORDER BY p.postdate LIMIT  $offset, $recordsperpage";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $stmt->store_result();
-      $stmt->bind_result($postBody, $postTitle, $postDate, $username, $commentBody);
+      $stmt->bind_result($postBody, $postTitle, $postDate, $username, $postID);
       
       echo '<div class="mb-5 mt-5 mx-auto">';
       while ($stmt->fetch()) {
@@ -54,17 +52,29 @@
           <span class="float-right"> ' . $username . ' </span> 
         </div>
         </div>'; 
-        if($commentBody != NULL)
+
+      //select p.body,p.title,p.postdate, u.nickname ,case when exists (select c.body from comments c where p.postID = c.postID) then (select c.body from comments c where p.postID = c.postID) end from post p, users u where p.userID = u.userID ORDER BY p.postdate LIMIT 5
+      $secondsql = "SELECT c.body, u.nickname from comments c, users u where c.postID = $postID and c.userID = u.userID";
+      $newstmt = $conn->prepare($secondsql);
+      $newstmt->execute();
+      $newstmt->store_result();
+      $newstmt->bind_result($commentBody, $nickname);
+      echo '<div class="card-header text-center" style="font-size: 20px;">  Comments </div>';
+      while ($newstmt->fetch()) {
+        if($commentBody != NULL )
         {
-        echo ' <div class="card-header text-center" style="font-size: 20px;">  Comments </div>
-          <div class="card-body" style="border: 1px solid black;">
-              <p class="card-text text-center" >' . $commentBody .'</p>
-            </div> 
-            </div> ';
+        echo ' 
+          <div class="card-body " style="border: 1px solid black;">
+              <p class="card-text text-center" >' . $commentBody . '<p class="float-right">'. $nickname . '</p>'.  '</p>';
+            '</div> ';
+        echo '</div> ';
+            
         }
       }
+     
+      }
       $stmt->free_result();
-      //create buttons for paging
+      //change paging for prev 5 posts
       if ($thispage > 1)
       {
 
@@ -92,7 +102,8 @@
           }
 
       }
-    
+
+          
   } 
 
 
